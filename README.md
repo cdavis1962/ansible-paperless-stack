@@ -108,11 +108,16 @@ paperless_api_token: "YOUR_TOKEN_HERE"
 
 🌐 Default Service URLs
 
-Service	URL\
-Paperless	http://SERVER:8000\
-Dozzle	http://SERVER:8080\
-Open WebUI	http://SERVER:3001\
-Paperless-AI	http://SERVER:3000\
+Service	URL
+
+Paperless	http://SERVER:8000
+
+Dozzle	http://SERVER:8080
+
+Open WebUI	http://SERVER:3001
+
+Paperless-AI	http://SERVER:3000
+
 Paperless-GPT	http://SERVER:3002
 
 
