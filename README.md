@@ -97,12 +97,12 @@ If enabling AI services:
 	3.	Go to Profile → API Tokens\
 	4.	Create a token\
 	5.	Set in:
-```
 inventories/lab/group_vars/paperless.yml
-
+```
 paperless_api_token: "YOUR_TOKEN_HERE"
 ```
-	6.	Re-run playbook with paperless_enable_ai=true
+
+	6.  Re-run playbook with paperless_enable_ai=true
 
 ⸻
 
