@@ -1,0 +1,25 @@
+---
+- name: Install OS dependencies (Debian/Ubuntu)
+  ansible.builtin.apt:
+    update_cache: true
+    name:
+      - ca-certificates
+      - curl
+      - git
+      - python3
+      - python3-pip
+      - docker.io
+      - docker-compose
+    state: present
+  when: ansible_facts.os_family == "Debian"
+
+- name: Enable and start Docker
+  ansible.builtin.service:
+    name: docker
+    enabled: true
+    state: started
+
+- name: Ensure docker compose plugin works
+  ansible.builtin.command: docker compose version
+  register: compose_version
+  changed_when: false

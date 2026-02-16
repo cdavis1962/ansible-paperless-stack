@@ -1,0 +1,34 @@
+---
+- name: Render compose file
+  ansible.builtin.template:
+    src: compose.yaml.j2
+    dest: "{{ paperless_stack_dir }}/compose.yaml"
+    mode: "0644"
+  register: compose_render
+
+- name: Render env files (core)
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ paperless_stack_dir }}/{{ item.dest }}"
+    mode: "0640"
+  loop:
+    - { src: "paperless.env.j2",  dest: "paperless/.env" }
+    - { src: "postgres.env.j2",   dest: "postgres/.env" }
+    - { src: "redis.env.j2",      dest: "redis/.env" }
+    - { src: "gotenberg.env.j2",  dest: "gotenberg/.env" }
+    - { src: "tika.env.j2",       dest: "tika/.env" }
+    - { src: "dozzle.env.j2",     dest: "dozzle/.env" }
+  register: env_core_render
+
+- name: Render env files (AI)
+  ansible.builtin.template:
+    src: "{{ item.src }}"
+    dest: "{{ paperless_stack_dir }}/{{ item.dest }}"
+    mode: "0640"
+  loop:
+    - { src: "ollama.env.j2",        dest: "ollama/.env" }
+    - { src: "open-webui.env.j2",    dest: "open-webui/.env" }
+    - { src: "paperless-ai.env.j2",  dest: "paperless-ai/.env" }
+    - { src: "paperless-gpt.env.j2", dest: "paperless-gpt/.env" }
+  when: paperless_enable_ai | bool
+  register: env_ai_render

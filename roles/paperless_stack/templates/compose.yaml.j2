@@ -1,0 +1,134 @@
+services:
+  paperless:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    container_name: paperless-ngx
+    restart: unless-stopped
+    env_file:
+      - ./paperless/.env
+    depends_on:
+      - postgres
+      - redis
+      - gotenberg
+      - tika
+    ports:
+      - "{{ paperless_port }}:8000"
+    volumes:
+      - ./paperless/data:/usr/src/paperless/data
+      - ./paperless/media:/usr/src/paperless/media
+      - ./paperless/export:/usr/src/paperless/export
+      - ./paperless/consume:/usr/src/paperless/consume
+
+  postgres:
+    image: postgres:18
+    container_name: postgres
+    restart: unless-stopped
+    env_file:
+      - ./postgres/.env
+    volumes:
+      - ./postgres/data:/var/lib/postgresql
+
+  redis:
+    image: docker.io/library/redis:8
+    container_name: redis
+    restart: unless-stopped
+    env_file:
+      - ./redis/.env
+    volumes:
+      - ./redis/data:/data
+
+  gotenberg:
+    image: docker.io/gotenberg/gotenberg:8.25
+    container_name: gotenberg
+    restart: unless-stopped
+    env_file:
+      - ./gotenberg/.env
+    command:
+      - "gotenberg"
+      - "--chromium-disable-javascript=true"
+      - "--chromium-allow-list=file:///tmp/.*"
+
+  tika:
+    image: docker.io/apache/tika:latest
+    container_name: tika
+    restart: unless-stopped
+    env_file:
+      - ./tika/.env
+
+  ollama:
+    profiles: ["ai"]
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    env_file:
+      - ./ollama/.env
+    ports:
+      - "11434:11434"
+    volumes:
+      - ./ollama/data:/root/.ollama
+      - ./ollama/models:/ollama-models
+{% if paperless_enable_nvidia | bool %}
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+{% endif %}
+
+  open-webui:
+    profiles: ["ai"]
+    image: ghcr.io/open-webui/open-webui:latest
+    container_name: open-webui
+    restart: unless-stopped
+    env_file:
+      - ./open-webui/.env
+    depends_on:
+      - ollama
+    ports:
+      - "{{ open_webui_port }}:8080"
+    volumes:
+      - ./open-webui/data:/app/backend/data
+
+  paperless-ai:
+    profiles: ["ai"]
+    image: clusterzx/paperless-ai:latest
+    container_name: paperless-ai
+    restart: unless-stopped
+    env_file:
+      - ./paperless-ai/.env
+    depends_on:
+      - ollama
+      - paperless
+    ports:
+      - "{{ paperless_ai_port }}:3000"
+    volumes:
+      - ./paperless-ai/data:/app/data
+
+  paperless-gpt:
+    profiles: ["ai"]
+    image: icereed/paperless-gpt:latest
+    container_name: paperless-gpt
+    restart: unless-stopped
+    env_file:
+      - ./paperless-gpt/.env
+    depends_on:
+      - ollama
+      - paperless
+    ports:
+      - "{{ paperless_gpt_port }}:8080"
+    volumes:
+      - ./paperless-gpt/prompts:/app/prompts
+
+  dozzle:
+    profiles: ["dozzle"]
+    image: amir20/dozzle:latest
+    container_name: dozzle
+    restart: unless-stopped
+    env_file:
+      - ./dozzle/.env
+    ports:
+      - "{{ dozzle_port }}:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./dozzle/data:/data

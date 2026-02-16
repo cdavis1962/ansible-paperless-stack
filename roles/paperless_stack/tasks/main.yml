@@ -1,0 +1,6 @@
+---
+- import_tasks: docker.yml
+- import_tasks: directories.yml
+- import_tasks: secrets.yml
+- import_tasks: compose.yaml
+- import_tasks: deploy.yaml

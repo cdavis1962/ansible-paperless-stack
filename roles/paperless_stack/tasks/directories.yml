@@ -1,0 +1,29 @@
+---
+- name: Create stack directory structure
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ paperless_stack_dir }}"
+
+    - "{{ paperless_stack_dir }}/paperless/data"
+    - "{{ paperless_stack_dir }}/paperless/media"
+    - "{{ paperless_stack_dir }}/paperless/export"
+    - "{{ paperless_stack_dir }}/paperless/consume"
+
+    - "{{ paperless_stack_dir }}/postgres/data"
+    - "{{ paperless_stack_dir }}/redis/data"
+
+    # Missing ones 👇
+    - "{{ paperless_stack_dir }}/gotenberg"
+    - "{{ paperless_stack_dir }}/tika"
+
+    # Optional services
+    - "{{ paperless_stack_dir }}/open-webui"
+    - "{{ paperless_stack_dir }}/open-webui/data"
+    - "{{ paperless_stack_dir }}/ollama/data"
+    - "{{ paperless_stack_dir }}/ollama/models"
+    - "{{ paperless_stack_dir }}/paperless-ai/data"
+    - "{{ paperless_stack_dir }}/paperless-gpt/prompts"
+    - "{{ paperless_stack_dir }}/dozzle/data"

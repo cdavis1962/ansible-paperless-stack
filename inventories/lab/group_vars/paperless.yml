@@ -1,0 +1,23 @@
+---
+paperless_stack_dir: /opt/paperless-stack
+paperless_tz: America/Phoenix
+
+# Optional toggles
+paperless_enable_ai: false
+paperless_enable_dozzle: true
+paperless_enable_nvidia: false
+
+# Ports (defaults from the stack)
+paperless_port: 8000
+paperless_ai_port: 3000
+open_webui_port: 3001
+paperless_gpt_port: 3002
+dozzle_port: 8080
+
+# Paperless auth (used by AI add-ons)
+paperless_admin_username: admin
+paperless_api_token: "CHANGE_ME_AFTER_FIRST_LOGIN"
+
+# Ollama models
+ollama_text_model: "llama3.2:3b"
+ollama_vision_model: "minicpm-v:8b"

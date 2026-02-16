@@ -1,0 +1,34 @@
+---
+- name: Pull images (with enabled profiles)
+  ansible.builtin.command:
+    cmd: >-
+      docker compose
+      {% if paperless_enable_ai | bool %} --profile ai{% endif %}
+      {% if paperless_enable_dozzle | bool %} --profile dozzle{% endif %}
+      pull
+  args:
+    chdir: "{{ paperless_stack_dir }}"
+  changed_when: false
+
+- name: Start/update stack (only if config changed)
+  ansible.builtin.command:
+    cmd: >-
+      docker compose
+      {% if paperless_enable_ai | bool %} --profile ai{% endif %}
+      {% if paperless_enable_dozzle | bool %} --profile dozzle{% endif %}
+      up -d
+  args:
+    chdir: "{{ paperless_stack_dir }}"
+  when: >
+    (compose_render is changed) or
+    (env_core_render is changed) or
+    (env_ai_render is defined and env_ai_render is changed)
+
+- name: Show URLs
+  ansible.builtin.debug:
+    msg:
+      - "Paperless-ngx:  http://{{ ansible_host | default(inventory_hostname) }}:{{ paperless_port }}"
+      - "Dozzle:        http://{{ ansible_host | default(inventory_hostname) }}:{{ dozzle_port }} (if enabled)"
+      - "Open WebUI:    http://{{ ansible_host | default(inventory_hostname) }}:{{ open_webui_port }} (if AI enabled)"
+      - "Paperless-AI:  http://{{ ansible_host | default(inventory_hostname) }}:{{ paperless_ai_port }} (if AI enabled)"
+      - "Paperless-GPT: http://{{ ansible_host | default(inventory_hostname) }}:{{ paperless_gpt_port }} (if AI enabled)"

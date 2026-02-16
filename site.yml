@@ -1,0 +1,6 @@
+---
+- name: Deploy Paperless Stack
+  hosts: paperless
+  become: true
+  roles:
+    - paperless_stack
